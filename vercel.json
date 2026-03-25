@@ -1,0 +1,4 @@
+{
+  "name": "wedo-cdp-craighouse",
+  "builds": [{ "src": "*.html", "use": "@vercel/static" }]
+}
