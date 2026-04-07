@@ -1402,78 +1402,80 @@ async function procesarMinuta() {
   btn.disabled = true;
   btn.textContent = '⏳ Procesando...';
 
-  // Animación de progreso indeterminada mientras espera
-  const steps = [
-    [15, 'Enviando minuta...'],
-    [35, 'Analizando con IA...'],
-    [60, 'Extrayendo tareas...'],
-    [80, 'Asignando directores...'],
-    [90, 'Enviando notificaciones...']
-  ];
-  let si = 0;
-  const ticker = setInterval(function() {
-    if (si < steps.length) {
-      bar.style.width = steps[si][0] + '%';
-      msg.textContent = steps[si][1];
-      si++;
-    }
-  }, 1800);
-
   try {
-    console.log('[WeDo] Enviando al webhook:', texto);
-    const resp = await fetch('https://javierabud.app.n8n.cloud/webhook-test/cdp-sesion', {
+    // 1. Enviar a n8n (responde rápido con 200, procesa en segundo plano)
+    console.log('[WeDo] Enviando al webhook n8n:', texto.substring(0, 80) + '...');
+    const resp = await fetch('https://javierabud.app.n8n.cloud/webhook/cdp-sesion', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 'transcripcion': texto })
+      body: JSON.stringify({ tipo: 'sesion', transcripcion: texto })
     });
 
-    clearInterval(ticker);
+    if (!resp.ok) throw new Error('n8n respondió con error ' + resp.status);
 
-    if (!resp.ok) throw new Error('El servidor respondió con error ' + resp.status);
-
-    const data = await resp.json().catch(function() { return {}; });
-
-    bar.style.width = '100%';
-    bar.style.background = 'var(--green)';
-    msg.textContent = '✅ Procesado correctamente';
-
-    const numTareas = (data.tareas && data.tareas.length) || data.tareas_extraidas || '—';
-    const numEmails = (data.emailsEnviados && data.emailsEnviados.length) || data.emails_enviados || '—';
+    // 2. n8n aceptó — mostrar spinner de espera y countdown de 20s
+    bar.style.width = '30%';
+    msg.textContent = 'WeDo está procesando tu reunión...';
 
     result.style.display = 'block';
     result.innerHTML =
-      '<div style="display:flex;align-items:flex-start;gap:12px;padding:16px 20px;background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;">' +
-        '<span style="font-size:20px;line-height:1;">✅</span>' +
+      '<div style="display:flex;align-items:flex-start;gap:12px;padding:16px 20px;background:#f0f4ff;border:1.5px solid #c7d2fe;border-radius:10px;">' +
+        '<span style="font-size:20px;line-height:1;">⏳</span>' +
         '<div>' +
-          '<div style="font-weight:700;color:#166534;font-size:14px;margin-bottom:6px;">Minuta procesada correctamente</div>' +
-          '<div style="font-size:13px;color:#15803d;line-height:1.7;">' +
-            '📋 Tareas extraídas: <strong>' + numTareas + '</strong><br>' +
-            '✉️ Emails enviados: <strong>' + numEmails + '</strong>' +
-          '</div>' +
-          '<div style="margin-top:10px;">' +
-            '<button class="btn btn-secondary" style="font-size:12px;" onclick="loadFirestoreData()">🔄 Actualizar historial</button>' +
-          '</div>' +
+          '<div style="font-weight:700;color:var(--navy);font-size:14px;margin-bottom:4px;">WeDo está procesando tu reunión...</div>' +
+          '<div style="font-size:13px;color:var(--muted);">La IA está extrayendo tareas y preparando los emails. El historial se actualizará automáticamente en <strong id="countdown">20</strong> segundos.</div>' +
         '</div>' +
       '</div>';
 
-    document.getElementById('minuta-textarea').value = '';
+    // 3. Countdown de 20s animando la barra
+    let segundos = 20;
+    const countdownEl = document.getElementById('countdown');
+    const countdownInterval = setInterval(function() {
+      segundos--;
+      if (countdownEl) countdownEl.textContent = segundos;
+      bar.style.width = Math.round(30 + ((20 - segundos) / 20) * 60) + '%';
+      msg.textContent = 'WeDo está procesando tu reunión... (' + segundos + 's)';
+      if (segundos <= 0) clearInterval(countdownInterval);
+    }, 1000);
+
+    // 4. Después de 20s, refrescar datos desde Firestore
+    setTimeout(async function() {
+      clearInterval(countdownInterval);
+      bar.style.width = '95%';
+      msg.textContent = 'Actualizando historial...';
+      await loadFirestoreData();
+      bar.style.width = '100%';
+      bar.style.background = 'var(--green)';
+      msg.textContent = '✅ Historial actualizado';
+      result.innerHTML =
+        '<div style="display:flex;align-items:flex-start;gap:12px;padding:16px 20px;background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;">' +
+          '<span style="font-size:20px;line-height:1;">✅</span>' +
+          '<div>' +
+            '<div style="font-weight:700;color:#166534;font-size:14px;margin-bottom:4px;">Minuta enviada a procesar</div>' +
+            '<div style="font-size:13px;color:#15803d;">Los emails se están enviando a los directores. Revisa la sección Historial para ver el resultado.</div>' +
+            '<div style="margin-top:10px;">' +
+              '<button class="btn btn-secondary" style="font-size:12px;" onclick="loadFirestoreData()">🔄 Refrescar historial</button>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+      document.getElementById('minuta-textarea').value = '';
+      btn.disabled = false;
+      btn.textContent = '🤖 Procesar con IA';
+    }, 20000);
 
   } catch (err) {
-    clearInterval(ticker);
     bar.style.width = '100%';
     bar.style.background = 'var(--coral)';
-    msg.textContent = '❌ Error al procesar';
-
+    msg.textContent = '❌ Error al enviar';
     result.style.display = 'block';
     result.innerHTML =
       '<div style="display:flex;align-items:flex-start;gap:12px;padding:16px 20px;background:#fff5f5;border:1.5px solid #f5c6c6;border-radius:10px;">' +
         '<span style="font-size:20px;line-height:1;">❌</span>' +
         '<div>' +
-          '<div style="font-weight:700;color:var(--coral);font-size:14px;margin-bottom:4px;">No se pudo procesar la minuta</div>' +
+          '<div style="font-weight:700;color:var(--coral);font-size:14px;margin-bottom:4px;">No se pudo enviar la minuta</div>' +
           '<div style="font-size:13px;color:var(--muted);">' + (err.message || 'Error desconocido') + '</div>' +
         '</div>' +
       '</div>';
-  } finally {
     btn.disabled = false;
     btn.textContent = '🤖 Procesar con IA';
   }
