@@ -1405,10 +1405,10 @@ async function procesarMinuta() {
   try {
     // 1. Enviar a n8n (responde rápido con 200, procesa en segundo plano)
     console.log('[WeDo] Enviando al webhook n8n:', texto.substring(0, 80) + '...');
-    const resp = await fetch('https://javierabud.app.n8n.cloud/webhook/cdp-sesion', {
+    const resp = await fetch('/api/n8n', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ tipo: 'sesion', transcripcion: texto })
+      body: JSON.stringify({ transcripcion: texto })
     });
 
     if (!resp.ok) throw new Error('n8n respondió con error ' + resp.status);
