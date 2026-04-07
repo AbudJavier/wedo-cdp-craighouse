@@ -1,4 +1,7 @@
 {
-  "name": "wedo-cdp-craighouse",
-  "builds": [{ "src": "*.html", "use": "@vercel/static" }]
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/$1" },
+    { "source": "/wedo-dashboard.html", "destination": "/public/wedo-dashboard.html" },
+    { "source": "/(.*)", "destination": "/public/index.html" }
+  ]
 }

@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WeDo · Gestión de Reuniones CDP</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --navy: #1B2A6B;
+            --coral: #C0392B;
+            --white: #FFFFFF;
+            --light: #F4F5F9;
+            --muted: #8892B0;
+            --border: #DDE0F0;
+        }
+
+        body {
+            font-family: 'DM Sans', -apple-system, sans-serif;
+            background: linear-gradient(135deg, var(--navy) 0%, #0f1a3f 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: var(--navy);
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .landing-card {
+            background: var(--white);
+            border-radius: 24px;
+            padding: 60px 40px;
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            animation: slideUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* LOGO ANIMATION */
+        .logo-wrapper {
+            margin-bottom: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 160px;
+        }
+
+        .logo {
+            font-size: 96px;
+            font-weight: 900;
+            letter-spacing: 6px;
+            background: linear-gradient(135deg, var(--navy), var(--coral));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: pulse 2s ease-in-out infinite, float 3s ease-in-out infinite;
+        }
+
+        .logo em {
+            font-style: normal;
+            color: var(--coral);
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.95;
+                transform: scale(1.02);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-8px);
+            }
+        }
+
+        .tagline {
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 24px;
+            font-weight: 700;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 900;
+            color: var(--navy);
+            margin-bottom: 16px;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            font-size: 15px;
+            color: var(--muted);
+            line-height: 1.6;
+            margin-bottom: 48px;
+        }
+
+        /* BUTTONS */
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .btn {
+            padding: 16px 24px;
+            border-radius: 12px;
+            border: none;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            text-decoration: none;
+            display: inline-block;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.15);
+            transition: left 0.4s;
+            z-index: -1;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--coral), #e74c3c);
+            color: var(--white);
+            box-shadow: 0 8px 24px rgba(192, 57, 43, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(192, 57, 43, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--light);
+            color: var(--navy);
+            border: 2px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--white);
+            border-color: var(--navy);
+            transform: translateY(-2px);
+        }
+
+        /* FEATURES SMALL */
+        .features {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 48px;
+            padding-top: 40px;
+            border-top: 1px solid var(--border);
+            gap: 20px;
+        }
+
+        .feature-item {
+            flex: 1;
+            text-align: center;
+        }
+
+        .feature-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .feature-label {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 600px) {
+            .landing-card {
+                padding: 40px 28px;
+            }
+
+            h1 {
+                font-size: 28px;
+            }
+
+            .logo {
+                font-size: 48px;
+            }
+
+            .features {
+                flex-wrap: wrap;
+            }
+        }
+
+        /* PASSWORD SECTION */
+        .pw-section {
+            margin-top: 20px;
+            overflow: hidden;
+            max-height: 0;
+            transition: max-height 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s;
+            opacity: 0;
+        }
+        .pw-section.visible {
+            max-height: 160px;
+            opacity: 1;
+        }
+        .pw-box {
+            background: var(--light);
+            border-radius: 16px;
+            padding: 20px 24px;
+            border: 2px solid var(--border);
+            text-align: left;
+        }
+        .pw-label {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 10px;
+        }
+        .pw-input-row {
+            display: flex;
+            gap: 10px;
+        }
+        .pw-input {
+            flex: 1;
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: 2px solid var(--border);
+            font-size: 16px;
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 700;
+            color: var(--navy);
+            background: var(--white);
+            outline: none;
+            transition: border-color 0.2s;
+            letter-spacing: 3px;
+        }
+        .pw-input:focus { border-color: var(--navy); }
+        .pw-input.error { border-color: var(--coral); animation: shake 0.4s ease; }
+        .pw-input.ok { border-color: #27ae60; }
+        .pw-enter {
+            padding: 12px 22px;
+            border-radius: 10px;
+            border: none;
+            background: var(--navy);
+            color: var(--white);
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .pw-enter:hover { background: #142052; transform: translateY(-1px); }
+        .pw-error {
+            font-size: 12px;
+            font-weight: 700;
+            margin-top: 8px;
+            min-height: 18px;
+            color: var(--coral);
+        }
+        .pw-error.ok { color: #27ae60; }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-8px); }
+            40% { transform: translateX(8px); }
+            60% { transform: translateX(-5px); }
+            80% { transform: translateX(5px); }
+        }
+
+        /* EXTRA: Floating elements background */
+        .background-decoration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.1;
+        }
+
+        .blob1 {
+            width: 300px;
+            height: 300px;
+            background: var(--white);
+            top: -50px;
+            right: -50px;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .blob2 {
+            width: 250px;
+            height: 250px;
+            background: var(--coral);
+            bottom: -30px;
+            left: -30px;
+            animation: float 10s ease-in-out infinite reverse;
+        }
+    </style>
+</head>
+<body>
+    <div class="background-decoration">
+        <div class="blob blob1"></div>
+        <div class="blob blob2"></div>
+    </div>
+
+    <div class="container">
+        <div class="landing-card">
+            <!-- LOGO CON ANIMACIÓN -->
+            <div class="logo-wrapper">
+                <div class="logo">We<em>Do</em></div>
+            </div>
+
+            <!-- CONTENIDO PRINCIPAL -->
+            <div class="tagline">🏫 Centro de Padres Craighouse</div>
+            <h1>Gestiona tus Reuniones</h1>
+            <p class="subtitle">
+                Procesa minutas con IA, automatiza tareas y visualiza todo en una carta Gantt.
+                Simple, rápido, inteligente.
+            </p>
+
+            <!-- BOTONES -->
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="goToUpload()">
+                    📤 Subir Minuta
+                </button>
+                <button class="btn btn-secondary" onclick="goToDashboard()">
+                    📊 Ir al Dashboard
+                </button>
+            </div>
+
+            <!-- PASSWORD (oculto, aparece al hacer clic) -->
+            <div class="pw-section" id="pw-section">
+                <div class="pw-box">
+                    <div class="pw-label">🔒 Contraseña de acceso · CDP Craighouse</div>
+                    <div class="pw-input-row">
+                        <input type="password" class="pw-input" id="pw-input"
+                               placeholder="••••••••"
+                               onkeydown="if(event.key==='Enter') checkPassword()">
+                        <button class="pw-enter" onclick="checkPassword()">Entrar →</button>
+                    </div>
+                    <div class="pw-error" id="pw-error"></div>
+                </div>
+            </div>
+
+            <!-- FEATURES PEQUEÑAS -->
+            <div class="features">
+                <div class="feature-item">
+                    <div class="feature-icon">🤖</div>
+                    <div class="feature-label">IA Integrada</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">📅</div>
+                    <div class="feature-label">Gantt Visual</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">✉️</div>
+                    <div class="feature-label">Notificaciones</div>
+                </div>
+            </div>
+
+            <!-- POWERED BY REMO -->
+            <div style="margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--border);">
+                <p style="font-size: 11px; color: var(--muted); letter-spacing: 1px;">
+                    Powered by <strong style="color: var(--navy);">Remo</strong> ✨
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let pendingAction = 'dashboard';
+
+        function goToUpload() {
+            pendingAction = 'upload';
+            showPassword();
+        }
+
+        function goToDashboard() {
+            pendingAction = 'dashboard';
+            showPassword();
+        }
+
+        function showPassword() {
+            const pw = document.getElementById('pw-section');
+            pw.classList.add('visible');
+            setTimeout(function(){ document.getElementById('pw-input').focus(); }, 420);
+        }
+
+        function checkPassword() {
+            const input = document.getElementById('pw-input');
+            const error = document.getElementById('pw-error');
+            const val = input.value.trim();
+
+            if (val === 'wedo2026') {
+                sessionStorage.setItem('wedo_auth', '1');
+                input.classList.add('ok');
+                error.classList.add('ok');
+                error.textContent = '✓ Acceso concedido · Cargando...';
+                var dest = pendingAction==='upload'?'wedo-dashboard.html?action=upload':'wedo-dashboard.html'; setTimeout(function(){ window.location.href=dest; }, 700);
+            } else {
+                input.classList.remove('error');
+                void input.offsetWidth;
+                input.classList.add('error');
+                error.classList.remove('ok');
+                error.textContent = '❌ Contraseña incorrecta. Intenta de nuevo.';
+                input.value = '';
+                setTimeout(function(){ input.classList.remove('error'); }, 500);
+            }
+        }
+    </script>
+</body>
+</html>
